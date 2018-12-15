@@ -23,7 +23,7 @@ int test_prime_num(unsigned long int p)
 {
 	unsigned long int i = 1;
 
-	for (i = 2; i < sqrt(p); ++i)
+	for (i = 2; i < p; ++i)
 		if (p % i == 0) return 0;
 	return 1;
 }

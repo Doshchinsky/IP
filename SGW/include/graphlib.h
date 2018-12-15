@@ -19,41 +19,57 @@
 #include "../include/hashtab.h"
 
 #define MAXVERTEX 1000
-#define MAXEDGE (((MAXVERTEX - 1)/2) * MAXVERTEX)
-#define _MAXEDGE(X) (((X - 1)/2) * X)
+#define MAXINT 1000
+#define MAXEDGE (((MAXVERTEX - 1) / 2) * MAXVERTEX)
+#define _MAXEDGE(X) ((X * (X - 1)) / 2)
+
+typedef struct RSA {
+  unsigned long int P;
+  unsigned long int Q;
+  unsigned long int N;
+  unsigned long int c;
+  unsigned long int d;
+  unsigned long int Phi;
+} rsa_t;
 
 struct EDGE {
   struct VERTEX* l_vertex;
   struct VERTEX* r_vertex;
-} EDGE;
+};
 
 struct VERTEX {
   int number;
   int color;
+  unsigned long int R;
+  rsa_t rsa;
+  unsigned long int Z;
   char gcolor[256];
-} VERTEX;
+};
 
-struct GRAPH {
+struct _GRAPH {
   struct VERTEX g_vertex[MAXVERTEX];
   struct EDGE g_edge[MAXEDGE];
+  int edge_amount;
+  int vertex_amount;
 } GRAPH;
 
-int vertex_check_connection(struct EDGE generated_edge, int vertex_amount);
-void graph_save_graphviz(int vertex_amount, int edge_amount);
-void graph_save(int vertex_amount, int edge_amount);
-void graph_sort(int edge_amount);
+int vertex_check_connection(struct EDGE generated_edge);
+void graph_save_graphviz(char *file);
+void graph_save();
+void graph_sort();
 void edge_swap(int a, int b);
 void vertex_swap(int position);
 int edge_uniqueness(int generated_edge);
-int edge_generation(int vertex_amount, int edge_amount);
-// int graph_generation(int vertex_amount, int edge_amount);
-void init_graph(int edge_amount, int vertex_amount);
-int init_color(int vertex_amount);
-int init_check_connect(int vertex_amount);
-
-int graph_coloring(int vertex_amount, int edge_amount,int cur_vertex);
-void graph_samples(int graph_choice, int* vertex_amount, int* edge_amount);
+int edge_generation();
+// int graph_generation();
+void init_graph();
+int init_color();
+int init_check_connect();
+int check_graph_coloring(int proof_amount);
+void generate_R(int i);
+int graph_coloring(int cur_vertex);
+void graph_samples(int graph_choice);
 void graph_generation(int graph_choice);
-int search_vertex(int v, int vertex_amount);
-void read_graph(int* edge_amount, int* vertex_amount, char* filename);
+int search_vertex(int v);
+void read_graph(char* filename);
 #endif
