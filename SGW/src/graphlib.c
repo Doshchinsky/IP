@@ -510,7 +510,7 @@ int check_graph_coloring(int proof_amount) {
     //Bob calculate colors
     expmod_func(GRAPH.g_edge[index_Bob].l_vertex->Z, key_left_vertex_c_Alice, GRAPH.g_edge[index_Bob].l_vertex->rsa.N, &left_color);
     expmod_func(GRAPH.g_edge[index_Bob].r_vertex->Z, key_right_vertex_c_Alice, GRAPH.g_edge[index_Bob].r_vertex->rsa.N, &right_color);
-    printf("%sPROOF%s %s#%d%s: Edge %s%d%s (%d -- %d) -> %s%X%s - %s%X%s (%lu - %lu)\n",
+    printf("%sPROOF%s %s#%d%s: Edge %s%d%s (%d -- %d) -> %s%lX%s - %s%lX%s (%lu - %lu)\n",
            YELLOW, RESET,
            GREEN, success_proof, RESET,
            YELLOW, index_Bob, RESET, GRAPH.g_edge[index_Bob].l_vertex->number, GRAPH.g_edge[index_Bob].r_vertex->number,
