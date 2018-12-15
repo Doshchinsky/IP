@@ -26,12 +26,12 @@ void graph_save_graphviz(char* file) {
   fprintf(graph_file, "graph ipgraph {\n");
   // print vertex config
   for (int i = 0; i < GRAPH.vertex_amount; ++i)
-    fprintf(graph_file, "%d [label=\"%d\", color=\"%s\"];\n", i+1, i+1, GRAPH.g_vertex[i].gcolor); 
+    fprintf(graph_file, "%d [label=\"%d\", color=\"%s\"];\n", i+1, i+1, GRAPH.g_vertex[i].gcolor);
 
   // print edges
   for (int i = 0; i < GRAPH.edge_amount; ++i)
     fprintf(graph_file, "%d -- %d [label=\"%d_%d\", color=\"%s\"]\n",
-                        GRAPH.g_edge[i].l_vertex->number, GRAPH.g_edge[i].r_vertex->number, GRAPH.g_edge[i].l_vertex->number, GRAPH.g_edge[i].r_vertex->number, "orange"); 
+                        GRAPH.g_edge[i].l_vertex->number, GRAPH.g_edge[i].r_vertex->number, GRAPH.g_edge[i].l_vertex->number, GRAPH.g_edge[i].r_vertex->number, "orange");
 
   fprintf(graph_file, "}\n");
   fclose (graph_file);
@@ -60,16 +60,20 @@ void generate_values() {
     strcpy(new_color_array[i], color_array[r]);
   }
 
-  printf("Associate array    : %s%s%s %s%s%s %s%s%s %s%s%s\n",
+  printf("\n%sDefault colors:%s\t\t%s%s%s\t%s%s%s\t%s%s%s\n", YELLOW, RESET,
          color_array[0], color_associate_array[0], RESET,
          color_array[1], color_associate_array[1], RESET,
-         color_array[2], color_associate_array[2], RESET,
-         color_array[3], color_associate_array[3], RESET);
-  printf("New Associate array: %s%s%s %s%s%s %s%s%s %s%s%s\n",
+         color_array[2], color_associate_array[2], RESET);
+  printf("%sEncrypted colors:%s\t%s%s%s\t%s%s%s\t%s%s%s\n\n", YELLOW, RESET,
          new_color_array[0], new_associate_array[0], RESET,
          new_color_array[1], new_associate_array[1], RESET,
-         new_color_array[2], new_associate_array[2], RESET,
-         new_color_array[3], new_associate_array[3], RESET);
+         new_color_array[2], new_associate_array[2], RESET);
+
+  printf("\t%sENCRYPTED GRAPH:%s\n", CYAN, RESET);
+  for (int i = 0; i < GRAPH.edge_amount; ++i) {
+    printf("%sEDGE #%d:%s\t%s%d%s--%s%d%s\n", YELLOW, i, RESET, new_color_array[GRAPH.g_edge[i].l_vertex->color], GRAPH.g_edge[i].l_vertex->number, RESET,  new_color_array[GRAPH.g_edge[i].r_vertex->color], GRAPH.g_edge[i].r_vertex->number, RESET);
+  }
+  printf("\n");
 
   for (i = 0 ; i < GRAPH.vertex_amount; ++i) {
     do {
@@ -78,7 +82,7 @@ void generate_values() {
         generate_prime_number(2, MAXINT, &GRAPH.g_vertex[i].rsa.Q);
      } while (GRAPH.g_vertex[i].rsa.P == GRAPH.g_vertex[i].rsa.Q);
 
-      GRAPH.g_vertex[i].rsa.N = GRAPH.g_vertex[i].rsa.P * GRAPH.g_vertex[i].rsa.Q; 
+      GRAPH.g_vertex[i].rsa.N = GRAPH.g_vertex[i].rsa.P * GRAPH.g_vertex[i].rsa.Q;
       GRAPH.g_vertex[i].rsa.Phi = (GRAPH.g_vertex[i].rsa.P - 1) * (GRAPH.g_vertex[i].rsa.Q - 1);
 
       GRAPH.g_vertex[i].rsa.d = 3;//generate_mutually_prime_number(Phi , 1, MAXINT);
@@ -86,11 +90,11 @@ void generate_values() {
       GRAPH.g_vertex[i].rsa.c = euclid_res[0];
       generate_R(i);
       expmod_func(GRAPH.g_vertex[i].R, GRAPH.g_vertex[i].rsa.d, GRAPH.g_vertex[i].rsa.N, &GRAPH.g_vertex[i].Z);
- 
+
       nod = (GRAPH.g_vertex[i].rsa.c * GRAPH.g_vertex[i].rsa.d) % GRAPH.g_vertex[i].rsa.Phi;
     } while (GRAPH.g_vertex[i].rsa.c > 0xFFFFFF || GRAPH.g_vertex[i].rsa.d <= 1 || nod != 1 || (GRAPH.g_vertex[i].Z == 0 && GRAPH.g_vertex[i].R != 0));
 
-    printf("Vertex #%d, nod(%d)\tr=%s%lu %X %lu%s,\tP=%lu,\tQ=%lu,\tN=%lu,\tc=%lu,\td=%lu,\tZ=%lu\n", i + 1,nod, new_color_array[GRAPH.g_vertex[i].color], GRAPH.g_vertex[i].R, GRAPH.g_vertex[i].R, GRAPH.g_vertex[i].R & 0x3 , RESET, GRAPH.g_vertex[i].rsa.P, GRAPH.g_vertex[i].rsa.Q, GRAPH.g_vertex[i].rsa.N, GRAPH.g_vertex[i].rsa.c, GRAPH.g_vertex[i].rsa.d, GRAPH.g_vertex[i].Z);
+    //printf("Vertex #%d, nod(%d)\tr=%s%lu %X %lu%s,\tP=%lu,\tQ=%lu,\tN=%lu,\tc=%lu,\td=%lu,\tZ=%lu\n", i + 1,nod, new_color_array[GRAPH.g_vertex[i].color], GRAPH.g_vertex[i].R, GRAPH.g_vertex[i].R, GRAPH.g_vertex[i].R & 0x3 , RESET, GRAPH.g_vertex[i].rsa.P, GRAPH.g_vertex[i].rsa.Q, GRAPH.g_vertex[i].rsa.N, GRAPH.g_vertex[i].rsa.c, GRAPH.g_vertex[i].rsa.d, GRAPH.g_vertex[i].Z);
   }
 }
 
@@ -171,7 +175,7 @@ int edge_uniqueness(int generated_edge) {
   return 0;
 }
 
-int vertex_check_connection(struct EDGE generated_edge) { 
+int vertex_check_connection(struct EDGE generated_edge) {
   int c = 0;
   int i = 0;
   count_disconnect_vertex = 0;
@@ -200,7 +204,7 @@ int vertex_check_connection(struct EDGE generated_edge) {
 }
 
 int vertex_check_connection_s(int curr_v)
-{ 
+{
   int i = 0;
   count_disconnect_vertex = 0;
   for (i = 0; i < GRAPH.edge_amount; ++i) {
@@ -228,7 +232,7 @@ int edge_generation()
 
       GRAPH.g_edge[i].l_vertex = &GRAPH.g_vertex[l];
       GRAPH.g_edge[i].r_vertex = &GRAPH.g_vertex[r];
-      
+
     } while(edge_uniqueness(i) || (GRAPH.g_edge[i].l_vertex->number == GRAPH.g_edge[i].r_vertex->number) || (vertex_check_connection(GRAPH.g_edge[i]) > 0));
 
 
@@ -240,7 +244,7 @@ int init_check_connect() {
   connect_vertex = (int*)malloc(GRAPH.vertex_amount * sizeof(int));
   for (int i = 0; i < GRAPH.vertex_amount; ++i) {
     connect_vertex[i] = 0;
-  } 
+  }
 
   return 0;
 }
@@ -282,7 +286,7 @@ void graph_samples(int graph_choice) {  switch (graph_choice) {
 void read_graph(char* filename) {
   FILE* graph_file;
   graph_file = fopen(filename, "r");
-  int _vertex_amount = 0; 
+  int _vertex_amount = 0;
   int _edge_amount = 0;
   int l = 0;
   int r = 0;
@@ -315,14 +319,14 @@ void read_graph(char* filename) {
     fscanf(graph_file, "%d", &l);
     fscanf(graph_file, "%d", &r);
     GRAPH.g_edge[i].l_vertex = &GRAPH.g_vertex[search_vertex(l)];
-    GRAPH.g_edge[i].r_vertex = &GRAPH.g_vertex[search_vertex(r)]; 
+    GRAPH.g_edge[i].r_vertex = &GRAPH.g_vertex[search_vertex(r)];
 
     if(edge_uniqueness(i) || (GRAPH.g_edge[i].l_vertex->number == GRAPH.g_edge[i].r_vertex->number)) {
       fprintf(stderr,"%s[ERROR]%s\tEdge %d -- %d\n", RED, RESET, l,r);
       exit(EXIT_FAILURE);
     }
   }
-     
+
   if (vertex_check_connection_s(0) == 1) {
     printf("%s[ERROR]%s:\t GRAPH is invalid!\n", RED, RESET);
     exit(EXIT_FAILURE);
@@ -361,7 +365,7 @@ int graph_coloring(int cur_vertex) {
   int result_coloring = 1;
   for (i = cur_vertex; i < GRAPH.vertex_amount; ++i) {
     color_mask = 0x7;
-    for (j = 0; j < GRAPH.edge_amount; ++j) { 
+    for (j = 0; j < GRAPH.edge_amount; ++j) {
       if (GRAPH.g_edge[j].l_vertex->number == GRAPH.g_vertex[i].number) {
         if (GRAPH.g_edge[j].r_vertex->color == 0) { // red
           color_mask = color_mask & 0x6;
@@ -506,7 +510,8 @@ int check_graph_coloring(int proof_amount) {
     //Bob calculate colors
     expmod_func(GRAPH.g_edge[index_Bob].l_vertex->Z, key_left_vertex_c_Alice, GRAPH.g_edge[index_Bob].l_vertex->rsa.N, &left_color);
     expmod_func(GRAPH.g_edge[index_Bob].r_vertex->Z, key_right_vertex_c_Alice, GRAPH.g_edge[index_Bob].r_vertex->rsa.N, &right_color);
-    printf("Proof %s%d%s: Edge %s%d%s (%d -- %d) -> %s%X%s - %s%X%s (%lu - %lu)\n",
+    printf("%sPROOF%s %s#%d%s: Edge %s%d%s (%d -- %d) -> %s%X%s - %s%X%s (%lu - %lu)\n",
+           YELLOW, RESET,
            GREEN, success_proof, RESET,
            YELLOW, index_Bob, RESET, GRAPH.g_edge[index_Bob].l_vertex->number, GRAPH.g_edge[index_Bob].r_vertex->number,
            new_color_array[left_color & 0x3], left_color, RESET,
@@ -521,7 +526,7 @@ int check_graph_coloring(int proof_amount) {
     --_proof_amount;
     ++success_proof;
   }
-  printf("\nProofs amount : %d\n", proof_amount);
-  printf("Success proofs: %s%d%s\n", GREEN, success_proof, RESET);
+  printf("\n%sProofs amount%s  : %s%d%s\n", YELLOW, RESET, WHITE, proof_amount, RESET);
+  printf("%sSuccess proofs%s : %s%d%s\n", YELLOW, RESET, GREEN, success_proof, RESET);
   return error;
 }
